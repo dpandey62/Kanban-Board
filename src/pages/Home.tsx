@@ -140,11 +140,11 @@ export default function Home() {
 
           {/* Big Heading */}
           <div className="text-center mt-16">
-            <h2 className="text-3xl md:text-5xl font-bold leading-tight">
-              Align work with your team’s capacity <br />
-              and enhance productivity with <br />
-              a real-time kanban board.
-            </h2>
+           <h2 className="text-3xl md:text-5xl font-bold leading-tight">
+  Plan your work better with your team <br />
+  and stay organized every day with <br />
+  a simple real-time Kanban board.
+</h2>
           </div>
 
         </div>
