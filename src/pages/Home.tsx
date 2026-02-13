@@ -15,7 +15,7 @@ export default function Home() {
           onClick={() => navigate("/")}
           className="text-2xl font-bold text-green-600 cursor-pointer"
         >
-          KanbanPro
+          Kanbanpro
         </h1>
 
         <div className="space-x-6 hidden md:flex">

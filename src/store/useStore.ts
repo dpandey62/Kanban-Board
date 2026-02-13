@@ -15,6 +15,8 @@ interface Store {
   deleteTask: (id: string) => void;
 
   clearError: () => void;
+  editTask: (id: string, title: string, description: string) => void;
+
 }
 
 export const useStore = create<Store>((set) => ({
@@ -34,6 +36,8 @@ export const useStore = create<Store>((set) => ({
 
   clearError: () => set({ error: null }),
 
+  // add task
+  
   addTask: (task) => {
     const newTask: Task = {
       id: uuid(),
@@ -45,12 +49,22 @@ export const useStore = create<Store>((set) => ({
     }));
   },
 
+  // Delete task
   deleteTask: (id) => {
     set((state) => ({
       tasks: state.tasks.filter((task) => task.id !== id),
     }));
   },
+  // Edit task
+  editTask: (id, title, description) => {
+  set((state) => ({
+    tasks: state.tasks.map((task) =>
+      task.id === id ? { ...task, title, description } : task
+    ),
+  }));
+},
 
+// move task
   moveTask: (id, status) => {
     set((state) => ({
       tasks: state.tasks.map((task) =>

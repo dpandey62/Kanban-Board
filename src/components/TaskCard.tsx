@@ -1,11 +1,16 @@
+import { useState } from "react";
 import { useDraggable } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
 import type { Task } from "../types/task";
 import { useStore } from "../store/useStore";
 
 export default function TaskCard({ task }: { task: Task }) {
-  const moveTask = useStore((state) => state.moveTask);
   const deleteTask = useStore((state) => state.deleteTask);
+  const editTask = useStore((state) => state.editTask);
+
+  const [isEditing, setIsEditing] = useState(false);
+  const [title, setTitle] = useState(task.title);
+  const [description, setDescription] = useState(task.description);
 
   const { attributes, listeners, setNodeRef, transform, isDragging } =
     useDraggable({ id: task.id });
@@ -17,46 +22,85 @@ export default function TaskCard({ task }: { task: Task }) {
     opacity: isDragging ? 0.85 : 1,
   };
 
-  const handleMove = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.stopPropagation();
-    const nextStatus = task.status === "todo" ? "inprogress" : "done";
-    moveTask(task.id, nextStatus);
-  };
-
-  const handleDelete = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.stopPropagation();
-    deleteTask(task.id);
+  const handleSave = () => {
+    if (!title.trim()) return;
+    editTask(task.id, title, description);
+    setIsEditing(false);
   };
 
   return (
     <div
       ref={setNodeRef}
       style={style}
-      {...listeners}
-      {...attributes}
+      {...(!isEditing ? listeners : {})}
+      {...(!isEditing ? attributes : {})}
       className="bg-gray-50 border rounded-xl p-4 shadow-sm hover:shadow-md transition cursor-grab active:cursor-grabbing"
     >
-      <p className="font-medium text-gray-700 mb-4">{task.title}</p>
+      {isEditing ? (
+        <>
+          <label className="block text-sm font-medium text-gray-600 mb-1">
+            Title
+          </label>
+          <input
+            type="text"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            className="w-full border p-2 rounded mb-3"
+            aria-label="Task title"
+          />
 
-      <div className="flex justify-between text-sm">
-        {task.status !== "done" && (
-          <button
-            onPointerDown={(e) => e.stopPropagation()}
-            onClick={handleMove}
-            className="text-indigo-600 hover:underline"
-          >
-            Move →
-          </button>
-        )}
+          <label className="block text-sm font-medium text-gray-600 mb-1">
+            Description
+          </label>
+          <textarea
+            rows={2}
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            className="w-full border p-2 rounded mb-3"
+            aria-label="Task description"
+          />
 
-        <button
-          onPointerDown={(e) => e.stopPropagation()}
-          onClick={handleDelete}
-          className="text-red-500 hover:underline"
-        >
-          Delete
-        </button>
-      </div>
+          <div className="flex justify-end gap-3 text-sm">
+            <button
+              onClick={() => setIsEditing(false)}
+              className="text-gray-500"
+            >
+              Cancel
+            </button>
+            <button onClick={handleSave} className="text-green-600 font-medium">
+              Save
+            </button>
+          </div>
+        </>
+      ) : (
+        <>
+          <p className="font-medium text-gray-700 mb-2">{task.title}</p>
+
+          {task.description && (
+            <p className="text-sm text-gray-500 mb-3">{task.description}</p>
+          )}
+
+          <div className="flex justify-between text-sm">
+            <button
+              onPointerDown={(e) => e.stopPropagation()}
+              onClick={() => setIsEditing(true)}
+              className="text-green-600 hover:underline"
+            >
+              Edit
+            </button>
+
+            <button
+              onPointerDown={(e) => e.stopPropagation()}
+              onClick={() => deleteTask(task.id)}
+              className="text-red-500 hover:underline"
+            >
+              Delete
+            </button>
+          </div>
+        </>
+      )}
     </div>
   );
 }
+
+
